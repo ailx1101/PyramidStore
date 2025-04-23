@@ -73,7 +73,7 @@ class Spider(Spider):
         return result
 
     def detailContent(self, ids):
-        data = self.getpq(self.fetch(self.host + ids[0], headers=self.headers).text)
+        data = self.getpq(self.fetch(ids[0], headers=self.headers).text)
         data2 = data('.moviedteail_list li')
         vod = {
             'vod_name': data('.dytext h1').text(),
