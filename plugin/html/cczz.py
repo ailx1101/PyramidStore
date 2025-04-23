@@ -6,6 +6,7 @@ import sys
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from pyquery import PyQuery as pq
+
 sys.path.append('')
 from base.spider import Spider
 
@@ -62,7 +63,7 @@ class Spider(Spider):
         pass
 
     def categoryContent(self, tid, pg, filter, extend):
-        data = self.getpq(self.fetch(f"{tid}{'' if pg == '1' else f'page/{pg}/'}", headers=self.headers).text)
+        data = self.getpq(self.fetch(f"{self.host}{tid}{'' if pg == '1' else f'page/{pg}/'}", headers=self.headers).text)
         result = {}
         result['list'] = self.getlist(data('.mi_cont .bt_img ul li'))
         result['page'] = pg
@@ -72,7 +73,7 @@ class Spider(Spider):
         return result
 
     def detailContent(self, ids):
-        data = self.getpq(self.fetch(self.host+ids[0], headers=self.headers).text)
+        data = self.getpq(self.fetch(self.host + ids[0], headers=self.headers).text)
         data2 = data('.moviedteail_list li')
         vod = {
             'vod_name': data('.dytext h1').text(),
@@ -95,7 +96,8 @@ class Spider(Spider):
         return result
 
     def searchContent(self, key, quick, pg="1"):
-        data = self.getpq(self.fetch(f"{self.host}/daoyongjiekoshibushiy0ubing?q={key}&f=_all&p={pg}", headers=self.headers).text)
+        data = self.getpq(
+            self.fetch(f"{self.host}/daoyongjiekoshibushiy0ubing?q={key}&f=_all&p={pg}", headers=self.headers).text)
         return {'list': self.getlist(data('.mi_cont .bt_img ul li')), 'page': pg}
 
     def playerContent(self, flag, id, vipFlags):
@@ -132,7 +134,7 @@ class Spider(Spider):
             videos.append({
                 'vod_id': i('a').attr('href'),
                 'vod_name': i('a img').attr('alt'),
-                'vod_pic': i('a img').attr('data-original'),
+                'vod_pic': i('a img').attr('data-original') or i('a img').attr('src'),
                 'vod_remarks': i('.hdinfo').text(),
                 'vod_year': i('.dyplayinfo').text() or i('.rating').text(),
             })
