@@ -1,0 +1,16 @@
+{
+    "sites": [
+        {
+            "key": "金牌",
+            "name": "金牌",
+            "type": 3,
+            "api": "https://ghp.ailx1101.cn/https://raw.githubusercontent.com/ailx1101/PyramidStore/refs/heads/test/plugin/html/%E9%87%91%E7%89%8C.py",
+            "searchable": 1,
+            "quickSearch": 1,
+            "filterable": 1,
+            "ext": {
+                "site": "https://www.jiabaide.cn"
+            }
+        }
+    ]
+}
