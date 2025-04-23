@@ -6,7 +6,7 @@ import sys
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from pyquery import PyQuery as pq
-sys.path.append('..')
+sys.path.append('')
 from base.spider import Spider
 
 
@@ -42,7 +42,7 @@ class Spider(Spider):
         'referer': f'{host}/',
         'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
         'priority': 'u=1, i',
-        'Cookie':"cf_clearance=RtOipX8O6XWyxP5rGAc9EvuRu7rp.9ZHiK10Tm.kvy8-1745386902-1.2.1.1-G7W5HAfdQw0doHECusBNtP4c6J.6kJqj8oBkLw1eYXo.gAxL1cTN.AE4nqklre9wB2hrCS6VzmEooMYAHKL_e4ToLZlaymkQxJPNqPSIOC67.Hst605egkNnH.CcCE_pErbvFGqGLXdLmG36Wvr92zTCGVK1kqXErYJ53RlM1PdTcKrHngchN6SHN9Xzkid62wmd9W29of76tgcMGlF_6L85ydTkTkHFoRZInof6ubY5Mit6520iR4zRo.1iZAZ4MlCJEst.BKS1uKcTDsAylDjeY.cbTrlY6MtISuzm2zADeIfwoa.zefv5Hr2klrDzUVbHo1D60a1MR8LCEmTYepKS0jD1tF7BHegGcZpk2Vrbqi8mgZpQSEZP_GNTfM2_; myannoun=1"
+        'Cookie': "cf_clearance=RtOipX8O6XWyxP5rGAc9EvuRu7rp.9ZHiK10Tm.kvy8-1745386902-1.2.1.1-G7W5HAfdQw0doHECusBNtP4c6J.6kJqj8oBkLw1eYXo.gAxL1cTN.AE4nqklre9wB2hrCS6VzmEooMYAHKL_e4ToLZlaymkQxJPNqPSIOC67.Hst605egkNnH.CcCE_pErbvFGqGLXdLmG36Wvr92zTCGVK1kqXErYJ53RlM1PdTcKrHngchN6SHN9Xzkid62wmd9W29of76tgcMGlF_6L85ydTkTkHFoRZInof6ubY5Mit6520iR4zRo.1iZAZ4MlCJEst.BKS1uKcTDsAylDjeY.cbTrlY6MtISuzm2zADeIfwoa.zefv5Hr2klrDzUVbHo1D60a1MR8LCEmTYepKS0jD1tF7BHegGcZpk2Vrbqi8mgZpQSEZP_GNTfM2_; myannoun=1"
     }
 
     def homeContent(self, filter):
@@ -72,7 +72,7 @@ class Spider(Spider):
         return result
 
     def detailContent(self, ids):
-        data = self.getpq(self.fetch(ids[0], headers=self.headers).text)
+        data = self.getpq(self.fetch(self.host+ids[0], headers=self.headers).text)
         data2 = data('.moviedteail_list li')
         vod = {
             'vod_name': data('.dytext h1').text(),
@@ -95,7 +95,7 @@ class Spider(Spider):
         return result
 
     def searchContent(self, key, quick, pg="1"):
-        data = self.getpq(self.fetch(f"{self.host}/page/{pg}/?s={key}", headers=self.headers).text)
+        data = self.getpq(self.fetch(f"{self.host}/daoyongjiekoshibushiy0ubing?q={key}&f=_all&p={pg}", headers=self.headers).text)
         return {'list': self.getlist(data('.mi_cont .bt_img ul li')), 'page': pg}
 
     def playerContent(self, flag, id, vipFlags):
@@ -132,8 +132,8 @@ class Spider(Spider):
             videos.append({
                 'vod_id': i('a').attr('href'),
                 'vod_name': i('a img').attr('alt'),
-                'vod_pic': i('a img').attr('src'),
-                'vod_remarks': i('.dycategory').text(),
+                'vod_pic': i('a img').attr('data-original'),
+                'vod_remarks': i('.hdinfo').text(),
                 'vod_year': i('.dyplayinfo').text() or i('.rating').text(),
             })
         return videos
