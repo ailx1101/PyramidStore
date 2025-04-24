@@ -27,6 +27,7 @@ class Spider(Spider):
     }
     keys = ["90070576afe435782122d0a06e1c6004"]
 
+    # 获取展示类别
     def homeContent(self, filter):
         t, key = self.getTK()
         self.data['time'] = t
@@ -55,18 +56,71 @@ class Spider(Spider):
         result['filters'] = filters
         return result
 
-    def getdata(self, path, data=None, json_data=None):
+    # 获取站点推荐内容
+    def homeVideoContent(self):
+        data = self.getdata('/api.php/smtv/top').get('data')
+        list = self.getlist(data)
+        return {'list': list}
+
+    # 搜索
+    def searchContent(self, key, quick, pg="1"):
+        data = self.getdata(f'/api.php/smtv/vod/?ac=list&zm={key}&page={pg}').get('data')
+        list = self.getlist(data, True)
+        return {'list': list, "page": pg}
+
+    # 根据类别获取
+    def categoryContent(self, tid, pg, filter, extend):
+        data = self.getdata(f'/api.php/smtv/vod/?ac=list&class={tid}&page={pg}').get('data')
+        result = {}
+        result['list'] = self.getlist(data, True)
+        result['page'] = pg
+        result['pagecount'] = 9999
+        result['limit'] = 90
+        result['total'] = 999999
+        return result
+    # 视频详情
+    def detailContent(self, ids):
+        data=self.getdata(f'/api.php/smtv/vod/{ids[0]}')
+        vod={}
+        vod['vod_id']=data.get('id')
+        vod['vod_name']=data.get('title')
+        vod['vod_remarks']=data.get('trunk')
+        vod['vod_content']=data.get('intro')
+        vod['vod_pic']=data.get('img_url')
+        vod['vod_year']=data.get('pubtime')
+        vod['vod_score']=data.get('season_num')
+        vod['vod_actor']=" ".join(data.get('actor'))
+        vod['vod_class']=" ".join(data.get('type'))
+        plist,tlist = [],[]
+        for i in data.get("video_list"):
+            tlist.append(i['name'].strip())
+            plist.append('#'.join([f"{j['title']}$@@{j['url']}" for j in i['list']]))
+        return {'list':[vod]}
+    # 播放视频
+
+    def getlist(self, data, search=False):
+        videos = []
+        for i in data:
+            videos.append({
+                'type_id': i['tjtype'].lower() if not search else i['type'].lower(),
+                'vod_id': i['tjurl'] if not search else i['nextlink'],
+                'vod_name': i['tjinfo'] if not search else i['title'],
+                'vod_pic': i['tjpicur'] if not search else i['pic'],
+                'vod_remarks': i['state']
+            })
+        return videos
+
+    def getdata(self, path, ):
+        t, key = self.getTK()
+        self.data['time'] = t
+        self.data['key'] = key
         url = f'{self.host}{path}'
-        response = self.post(url, headers=self.headers, data=data, json=json_data).text
+        response = self.post(url, headers=self.headers, data=self.data).text
         return json.loads(self.decrypt(response, self.keys[0]))
 
     def getf(self, type_id):
         try:
-            t, key = self.getTK()
-            self.data['time'] = t
-            self.data['key'] = key
-            fdata = self.getdata(f'/api.php/smtv/vod/?&ac=flitter&class={type_id}',
-                                 data=self.data)
+            fdata = self.getdata(f'/api.php/smtv/vod/?&ac=flitter&class={type_id}')
             filter_list = []
             for value in fdata['flitter']:
                 if len(value):
