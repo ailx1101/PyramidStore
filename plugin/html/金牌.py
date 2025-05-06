@@ -153,7 +153,7 @@ class Spider(Spider):
         pdata = self.fetch(f"{self.host}/api/mw-movie/anonymous/v2/video/episode/url?clientType=1&id={ids[0]}&nid={ids[1]}",headers=self.getheaders({'clientType':'1','id': ids[0], 'nid': ids[1]})).json()
         vlist=[]
         for i in pdata['data']['list']:vlist.extend([i['resolutionName'],i['url']])
-        return {'parse':0,'url':vlist,'header':self.header}
+        return {'parse':0,'url':vlist[1],'header':self.header}
 
     def localProxy(self, param):
         pass
